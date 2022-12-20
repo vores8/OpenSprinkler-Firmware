@@ -1138,24 +1138,37 @@ void OpenSprinkler::apply_all_station_bits() {
 	digitalWrite(PIN_SR_LATCH, LOW);
 	byte bid, s, sbits;
 
-	// Shift out all station bit values
-	// from the highest bit to the lowest
-	for(bid=0;bid<=MAX_EXT_BOARDS;bid++) {
-		if (status.enabled)
-			sbits = station_bits[MAX_EXT_BOARDS-bid];
-		else
-			sbits = 0;
+// FOR USE WITH WAVESHARE RPi Relay Board (B) -- START
+	byte waveshare_pins[8] = {5, 6, 13, 16, 19, 20, 21, 26};
+
+	if (status.enabled)
+		sbits = station_bits[0];
+	else
+		sbits = 0;
 
 		for(s=0;s<8;s++) {
-			digitalWrite(PIN_SR_CLOCK, LOW);
 	#if defined(OSPI) // if OSPI, use dynamically assigned pin_sr_data
-			digitalWrite(pin_sr_data, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
-	#else
-			digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
+			digitalWrite(waveshare_pins[s], (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
 	#endif
-			digitalWrite(PIN_SR_CLOCK, HIGH);
 		}
-	}
+// FOR USE WITH WAVESHARE RPi Relay Board (B) -- END
+
+	// for(bid=0;bid<=MAX_EXT_BOARDS;bid++) {
+	// 	if (status.enabled)
+	// 		sbits = station_bits[MAX_EXT_BOARDS-bid];
+	// 	else
+	// 		sbits = 0;
+
+	// 	for(s=0;s<8;s++) {
+	// 		digitalWrite(PIN_SR_CLOCK, LOW);
+	// #if defined(OSPI) // if OSPI, use dynamically assigned pin_sr_data
+	// 		digitalWrite(pin_sr_data, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
+	// #else
+	// 		digitalWrite(PIN_SR_DATA, (sbits & ((byte)1<<(7-s))) ? HIGH : LOW );
+	// #endif
+	// 		digitalWrite(PIN_SR_CLOCK, HIGH);
+	// 	}
+	// }
 
 	#if defined(ARDUINO)
 	if((hw_type==HW_TYPE_DC) && engage_booster) {
